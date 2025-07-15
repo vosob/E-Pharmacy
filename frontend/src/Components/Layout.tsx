@@ -1,17 +1,20 @@
+import { Outlet } from "react-router-dom";
 import { Header } from "./Header/Header";
 import { Nav } from "./Nav/Nav";
 
-type LayoutProps = {
-  children: React.ReactNode;
-};
+// type LayoutProps = {
+//   children: React.ReactNode;
+// };
 
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = () => {
   return (
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Nav />
-        <main className="flex-1 overflow-auto p-4">{children}</main>
+        <main className="flex-1 overflow-auto p-4">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
