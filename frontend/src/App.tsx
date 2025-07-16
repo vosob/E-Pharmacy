@@ -6,12 +6,29 @@ import { AllProducts } from "./pages/AllProducts/AllProducts";
 import { AllSuppliers } from "./pages/AllSuppliers/AllSuppliers";
 import { AllCustomers } from "./pages/AllCustomers/AllCustomers";
 import { Auth } from "./pages/Auth/Auth";
+import { PrivateRoute } from "./pages/PrivateRoute";
+import { PublicRoute } from "./pages/PublicRoute";
+
 function App() {
   return (
     <Routes>
-      <Route path="/auth" element={<Auth />} />
+      <Route
+        path="/auth"
+        element={
+          <PublicRoute>
+            <Auth />
+          </PublicRoute>
+        }
+      />
 
-      <Route path="/" element={<Layout />}>
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="all-orders" element={<AllOrders />} />
         <Route path="all-products" element={<AllProducts />} />

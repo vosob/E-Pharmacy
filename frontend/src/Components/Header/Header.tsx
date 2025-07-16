@@ -1,6 +1,13 @@
+import { useAuth } from "@/context/AuthContext";
 import { LogOut } from "lucide-react";
 
 export const Header = () => {
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <header className="bg-[#F7F8FA] h-20 w-full pl-5 pr-10 pt-[15px]">
       <div className="flex">
@@ -9,7 +16,10 @@ export const Header = () => {
           <h1 className="text-2xl font-semibold">Medicine store</h1>
           <p className="text-gray-400">Dashboard | vendor@gmail.com</p>
         </div>
-        <LogOut className="ml-auto w-11 h-11 text-white bg-[#59B17A] p-3 rounded-full" />
+        <LogOut
+          onClick={handleLogout}
+          className="ml-auto w-11 h-11 text-white bg-[#59B17A] p-3 rounded-full cursor-pointer"
+        />
       </div>
     </header>
   );

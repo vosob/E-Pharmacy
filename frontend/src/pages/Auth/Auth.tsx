@@ -1,7 +1,38 @@
+import { loginUser, registerUser } from "@/api/auth";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+interface FormValues {
+  email: string;
+  password: string;
+}
 
 export const Auth = () => {
+  const { register, handleSubmit, reset } = useForm<FormValues>();
+  const [isLogin, setIsLogin] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    try {
+      if (isLogin) {
+        const response = await loginUser(data);
+        login(response.token);
+        navigate("/");
+      } else {
+        await registerUser(data);
+      }
+      reset();
+    } catch (error) {
+      console.error(isLogin ? "Login failed" : "Registration failed", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F7F8FA] px-6 pt-7">
       <div className="max-w-7xl mx-auto">
@@ -27,10 +58,40 @@ export const Auth = () => {
 
           {/* right side */}
           <div>
-            <form className="flex flex-col gap-3.5 w-[323px] ml-[130px]">
-              <Input type="text" placeholder="Email address" />
-              <Input type="password" placeholder="Password" />
-              <Button className="bg-[#59B17A] mt-5">Log in</Button>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-3.5 w-[323px] ml-[130px]"
+            >
+              <Input
+                {...register("email", { required: "Email is required" })}
+                type="text"
+                placeholder="Email address"
+              />
+              <Input
+                {...register("password", { required: "Password is required" })}
+                type="password"
+                placeholder="Password"
+              />
+              <Button
+                type="submit"
+                className="bg-[#59B17A] mt-5 cursor-pointer"
+              >
+                {isLogin ? "Увійти" : "Зареєструватися"}
+              </Button>
+
+              {/* Toggle between login and register */}
+              <div className="text-center mt-4">
+                <span className="text-gray-600">
+                  {isLogin ? "Немає акаунту? " : "Уже маєте акаунт? "}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-[#59B17A] font-medium hover:underline cursor-pointer"
+                >
+                  {isLogin ? "Зареєструватися" : "Увійти"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
