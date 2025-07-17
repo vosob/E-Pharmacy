@@ -27,3 +27,21 @@ model User {
   
   createdAt DateTime @default(now())
 }
+
+enum Status {
+  Active 
+  Deactive
+}
+
+model Suppliers {
+  id        String      @id @default(cuid())
+  
+  suppliersInfo String
+  address String
+  company String  
+  deliveryDate DateTime
+  amount Int
+  status Status
+
+  createdAt DateTime @default(now())
+}

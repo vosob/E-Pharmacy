@@ -34,10 +34,6 @@ function auth(req, res, next) {
         return res.status(401).send({ message: "Invalid token 4" });
       }
 
-      if (user.token !== token) {
-        return res.status(401).send({ message: "Invalid token 5" });
-      }
-
       req.user = {
         id: decode.id,
         email: decode.email,
