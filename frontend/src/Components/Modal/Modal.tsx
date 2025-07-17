@@ -13,6 +13,10 @@ import {
 } from "@/Components/ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useForm, Controller } from "react-hook-form";
+
+import type { Suppliers } from "@/types/suppliers";
+import { createSupplier } from "@/api/suppliers";
 
 type Props = {
   open: boolean;
@@ -20,6 +24,23 @@ type Props = {
 };
 
 export const Modal = ({ open, setOpen }: Props) => {
+  const { register, handleSubmit, reset, control } = useForm<Suppliers>();
+
+  const onSubmit = async (data: Suppliers) => {
+    try {
+      await createSupplier(data);
+      reset();
+      setOpen(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCancel = () => {
+    reset();
+    setOpen(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-10">
@@ -27,31 +48,68 @@ export const Modal = ({ open, setOpen }: Props) => {
           <DialogTitle>Add a new suppliers</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-4 mb-10">
-          <Input placeholder="Suppliers Info" type="text" />
-          <Input placeholder="Address" type="text" />
-          <Input placeholder="Company" type="text" />
-          <Input placeholder="Delivery date" type="date" />
-          <Input placeholder="Amount" type="number" />
-          <Select>
-            <SelectTrigger className="w-[205px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Active</SelectItem>
-              <SelectItem value="dark">Deactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-2 gap-4 mb-10">
+            <Input
+              placeholder="Suppliers Info"
+              type="text"
+              {...register("suppliersInfo", { required: true })}
+            />
+            <Input
+              placeholder="Address"
+              type="text"
+              {...register("address", { required: true })}
+            />
+            <Input
+              placeholder="Company"
+              type="text"
+              {...register("company", { required: true })}
+            />
+            <Input
+              placeholder="Delivery date"
+              type="date"
+              {...register("deliveryDate", { required: true })}
+            />
+            <Input
+              placeholder="Amount"
+              type="number"
+              {...register("amount", { required: true, valueAsNumber: true })}
+            />
 
-        <div>
-          <Button className="w-[133px] mr-2 bg-[#59B17A] cursor-pointer">
-            Add
-          </Button>
-          <Button className="w-[133px]  bg-[#1D1E211A] text-gray-500 cursor-pointer">
-            Cancel
-          </Button>
-        </div>
+            <Controller
+              name="status"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-[205px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Deactive">Deactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div>
+            <Button
+              type="submit"
+              className="w-[133px] mr-2 bg-[#59B17A] cursor-pointer"
+            >
+              Add
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCancel}
+              className="w-[133px] bg-[#1D1E211A] text-gray-500 cursor-pointer"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

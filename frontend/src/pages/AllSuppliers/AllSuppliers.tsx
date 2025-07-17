@@ -1,4 +1,5 @@
 import { Modal } from "@/Components/Modal/Modal";
+import { SuppliersTable } from "@/Components/SuppliersTable/SuppliersTable";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Funnel } from "lucide-react";
@@ -24,6 +25,7 @@ export const AllSuppliers = () => {
 
         <Modal open={open} setOpen={setOpen} />
       </div>
+      <SuppliersTable />
     </div>
   );
 };
