@@ -4,6 +4,7 @@ import { tokenUtils } from "@/lib/auth";
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
+  isLoading: boolean;
   login: (token: string) => void;
   logout: () => void;
 }
@@ -14,6 +15,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setToken(savedToken);
       setIsAuthenticated(true);
     }
+    setIsLoading(false);
   }, []);
 
   const login = (newToken: string) => {
@@ -37,7 +40,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, token, login, logout, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );

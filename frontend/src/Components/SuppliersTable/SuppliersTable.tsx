@@ -1,4 +1,3 @@
-import { getSuppliers } from "@/api/suppliers";
 import {
   Table,
   TableBody,
@@ -8,15 +7,12 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import type { Suppliers } from "@/types/suppliers";
-import { useEffect, useState } from "react";
 
-export const SuppliersTable = () => {
-  const [tableData, setTableData] = useState<Suppliers[]>([]);
+type Props = {
+  tableData: Suppliers[];
+};
 
-  useEffect(() => {
-    getSuppliers().then((data) => setTableData(data));
-  }, []);
-
+export const SuppliersTable = ({ tableData }: Props) => {
   return (
     <div className="mt-5 px-5">
       <h1 className="bg-[#E7F1ED] p-5 rounded-t-xl text-[18px] text[#1D1E21] font-semibold">

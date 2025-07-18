@@ -3,10 +3,36 @@ import { SuppliersTable } from "@/Components/SuppliersTable/SuppliersTable";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Funnel } from "lucide-react";
-import { useState } from "react";
+import type { Suppliers } from "@/types/suppliers";
+import { useEffect, useState } from "react";
+import { getSuppliersPaginated } from "@/api/suppliers";
+import { SuppliersPagination } from "@/Components/SuppliersPagination/SuppliersPagination";
+
+const rowsPerPage = 5;
+const minPage = 1;
 
 export const AllSuppliers = () => {
   const [open, setOpen] = useState(false);
+  const [tableData, setTableData] = useState<Suppliers[]>([]);
+
+  const [startIndex, setStartIndex] = useState(minPage);
+  const [maxPage, setMaxPage] = useState<number | null>(null);
+
+  const prevPageHandler = () => {
+    setStartIndex((curr) => (curr - 1 >= minPage ? curr - 1 : curr));
+  };
+  const nextPageHandler = () => {
+    setStartIndex((curr) =>
+      maxPage != null && curr + 1 <= maxPage ? curr + 1 : curr
+    );
+  };
+
+  useEffect(() => {
+    getSuppliersPaginated(startIndex, rowsPerPage).then((res) => {
+      setTableData(res.data);
+      setMaxPage(res.totalPages);
+    });
+  }, [startIndex]);
 
   return (
     <div>
@@ -23,9 +49,15 @@ export const AllSuppliers = () => {
           Add a new supplier
         </Button>
 
-        <Modal open={open} setOpen={setOpen} />
+        <Modal open={open} setOpen={setOpen} setTableData={setTableData} />
       </div>
-      <SuppliersTable />
+      <SuppliersTable tableData={tableData} />
+      <SuppliersPagination
+        prevPageHandler={prevPageHandler}
+        nextPageHandler={nextPageHandler}
+        disabledPrev={startIndex === minPage}
+        disabledNext={maxPage != null && startIndex + 1 > maxPage}
+      />
     </div>
   );
 };

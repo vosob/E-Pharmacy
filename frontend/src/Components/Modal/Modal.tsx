@@ -16,14 +16,15 @@ import { Button } from "../ui/button";
 import { useForm, Controller } from "react-hook-form";
 
 import type { Suppliers } from "@/types/suppliers";
-import { createSupplier } from "@/api/suppliers";
+import { createSupplier, getSuppliers } from "@/api/suppliers";
 
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  setTableData: (tableData: Suppliers[]) => void;
 };
 
-export const Modal = ({ open, setOpen }: Props) => {
+export const Modal = ({ open, setOpen, setTableData }: Props) => {
   const { register, handleSubmit, reset, control } = useForm<Suppliers>();
 
   const onSubmit = async (data: Suppliers) => {
@@ -33,6 +34,8 @@ export const Modal = ({ open, setOpen }: Props) => {
       setOpen(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      getSuppliers().then((data) => setTableData(data));
     }
   };
 

@@ -3,7 +3,11 @@ import { useAuth } from "../context/AuthContext";
 import type { ReactNode } from "react";
 
 export const PrivateRoute = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
