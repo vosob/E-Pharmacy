@@ -5,8 +5,31 @@ const prisma = new PrismaClient();
 
 const getSuppliers = async (req, res, next) => {
   try {
-    const suppliers = await prisma.suppliers.findMany();
-    res.status(200).json(suppliers);
+    let page = parseInt(req.query.page) || 1;
+
+    const limit = parseInt(req.query.limit) || 10;
+
+    const totalCount = await prisma.suppliers.count();
+    const totalPages = Math.ceil(totalCount / limit) || 1;
+
+    if (page > totalPages) page = totalPages;
+
+    const skip = (page - 1) * limit;
+
+    const suppliers = await prisma.suppliers.findMany({
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      data: suppliers,
+      page,
+      totalPages,
+      totalItems: totalCount,
+    });
   } catch (error) {
     next(error);
   }
