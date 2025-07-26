@@ -7,4 +7,6 @@ router.get("/", SuppliersController.getSuppliers);
 
 router.post("/", SuppliersController.createSupplier);
 
+router.put("/:id", SuppliersController.updateSupplier);
+
 export default router;

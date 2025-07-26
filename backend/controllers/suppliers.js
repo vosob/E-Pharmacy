@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 const getSuppliers = async (req, res, next) => {
   try {
+    const userId = req.user.id;
     let page = parseInt(req.query.page) || 1;
 
     const limit = parseInt(req.query.limit) || 10;
@@ -17,6 +18,9 @@ const getSuppliers = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const suppliers = await prisma.suppliers.findMany({
+      where: {
+        userId,
+      },
       skip,
       take: limit,
       orderBy: {
@@ -37,6 +41,7 @@ const getSuppliers = async (req, res, next) => {
 
 const createSupplier = async (req, res, next) => {
   try {
+    const userId = req.user.id;
     const { suppliersInfo, address, company, deliveryDate, amount, status } =
       req.body;
 
@@ -48,6 +53,7 @@ const createSupplier = async (req, res, next) => {
         deliveryDate: new Date(deliveryDate),
         amount,
         status,
+        userId,
       },
     });
 
@@ -60,4 +66,45 @@ const createSupplier = async (req, res, next) => {
   }
 };
 
-export default { getSuppliers, createSupplier };
+const updateSupplier = async (req, res, next) => {
+  const { id } = req.params;
+  const { suppliersInfo, address, company, deliveryDate, amount, status } =
+    req.body;
+
+  try {
+    const existingSupplier = await prisma.suppliers.findUnique({
+      where: { id },
+    });
+
+    if (!existingSupplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    const updatedSupplier = await prisma.suppliers.update({
+      where: {
+        id,
+      },
+      data: {
+        suppliersInfo,
+        address,
+        company,
+        deliveryDate: new Date(deliveryDate),
+        amount,
+        status,
+      },
+    });
+
+    if (!updatedSupplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    res.status(200).json({
+      message: "Supplier updated successfully",
+      supplier: updatedSupplier,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { getSuppliers, createSupplier, updateSupplier };
