@@ -8,17 +8,7 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL,
 });
 
-export const getSuppliers = async () => {
-  const response = await axiosInstance.get("/?page=1&limit=5", {
-    headers: tokenUtils.getAuthHeaders(),
-  });
-  return response.data;
-};
-
-export const getSuppliersPaginated = async (
-  startIndex: number,
-  rowsPerPage: number
-) => {
+export const getSuppliers = async (startIndex: number, rowsPerPage: number) => {
   const response = await axiosInstance.get(
     `/?page=${startIndex}&limit=${rowsPerPage}`,
     {
@@ -30,6 +20,13 @@ export const getSuppliersPaginated = async (
 
 export const createSupplier = async (data: Suppliers) => {
   const response = await axiosInstance.post("/", data, {
+    headers: tokenUtils.getAuthHeaders(),
+  });
+  return response.data;
+};
+
+export const updateSupplier = async (id: string, data: Suppliers) => {
+  const response = await axiosInstance.put(`/${id}`, data, {
     headers: tokenUtils.getAuthHeaders(),
   });
   return response.data;

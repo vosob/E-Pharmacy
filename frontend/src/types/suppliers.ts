@@ -5,7 +5,7 @@ export type Suppliers = {
   suppliersInfo: string;
   address: string;
   company: string;
-  deliveryDate: Date;
+  deliveryDate: string;
   amount: number;
 
   status: Status;

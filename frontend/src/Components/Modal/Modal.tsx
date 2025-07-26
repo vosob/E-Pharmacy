@@ -16,28 +16,65 @@ import { Button } from "../ui/button";
 import { useForm, Controller } from "react-hook-form";
 
 import type { Suppliers } from "@/types/suppliers";
-import { createSupplier, getSuppliers } from "@/api/suppliers";
+import { createSupplier, getSuppliers, updateSupplier } from "@/api/suppliers";
+import { useEffect, useState } from "react";
+import moment from "moment";
 
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   setTableData: (tableData: Suppliers[]) => void;
+  startIndex: number;
+  rowsPerPage: number;
+  supplierToEdit: Suppliers | null;
 };
 
-export const Modal = ({ open, setOpen, setTableData }: Props) => {
+export const Modal = ({
+  open,
+  setOpen,
+  setTableData,
+  startIndex,
+  rowsPerPage,
+  supplierToEdit,
+}: Props) => {
   const { register, handleSubmit, reset, control } = useForm<Suppliers>();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: Suppliers) => {
     try {
-      await createSupplier(data);
+      setLoading(true);
+
+      if (supplierToEdit) {
+        await updateSupplier(supplierToEdit.id, data);
+      } else {
+        await createSupplier(data);
+      }
+
       reset();
       setOpen(false);
+
+      const res = await getSuppliers(startIndex, rowsPerPage);
+      setTableData(res.data);
     } catch (error) {
       console.log(error);
     } finally {
-      getSuppliers().then((data) => setTableData(data));
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (open && supplierToEdit) {
+      console.log(supplierToEdit, typeof supplierToEdit.deliveryDate);
+      reset({
+        suppliersInfo: supplierToEdit.suppliersInfo,
+        address: supplierToEdit.address,
+        company: supplierToEdit.company,
+        deliveryDate: moment(supplierToEdit.deliveryDate).format("YYYY-MM-DD"),
+        amount: supplierToEdit.amount,
+        status: supplierToEdit.status,
+      });
+    }
+  }, [supplierToEdit, open, reset]);
 
   const handleCancel = () => {
     reset();
@@ -48,7 +85,9 @@ export const Modal = ({ open, setOpen, setTableData }: Props) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-10">
         <DialogHeader className="mb-10">
-          <DialogTitle>Add a new suppliers</DialogTitle>
+          <DialogTitle>
+            {supplierToEdit ? "Edit Supplier" : "Add a new suppliers"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -100,9 +139,10 @@ export const Modal = ({ open, setOpen, setTableData }: Props) => {
           <div>
             <Button
               type="submit"
+              disabled={loading}
               className="w-[133px] mr-2 bg-[#59B17A] cursor-pointer"
             >
-              Add
+              {supplierToEdit ? "Update" : "Add"}
             </Button>
             <Button
               type="button"
