@@ -14,3 +14,10 @@ export const getCustomers = async () => {
   });
   return response.data as Customers[];
 };
+
+export const createCustomer = async (data: Customers) => {
+  const response = await axiosInstance.post("/", data, {
+    headers: tokenUtils.getAuthHeaders(),
+  });
+  return response.data;
+};
